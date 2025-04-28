@@ -1,0 +1,134 @@
+API DE MENSAGENS AGENDADAS
+=========================
+
+Documentação dos endpoints para gerenciamento de mensagens agendadas no Chatwoot.
+
+1. LISTAR MENSAGENS AGENDADAS
+----------------------------
+GET /api/v1/accounts/{account_id}/conversations/{conversation_id}/scheduled_messages
+
+Resposta (200 OK):
+{
+  "payload": [
+    {
+      "id": 1,
+      "conversation_id": 123,
+      "inbox_id": 456,
+      "title": "Título do agendamento",
+      "content": "Conteúdo da mensagem",
+      "scheduled_at": 1707624000,
+      "status": "pending",
+      "created_at": "2024-02-10T10:00:00Z",
+      "updated_at": "2024-02-10T10:00:00Z"
+    }
+  ]
+}
+
+2. CRIAR MENSAGEM AGENDADA
+-------------------------
+POST /api/v1/accounts/{account_id}/conversations/{conversation_id}/scheduled_messages
+
+Corpo da requisição:
+{
+  "scheduled_message": {
+    "conversation_id": 123,
+    "inbox_id": 456,
+    "content": "Conteúdo da mensagem",
+    "scheduled_at": "2024-02-11T15:00:00Z",
+    "title": "Título do agendamento",
+    "status": "pending"
+  }
+}
+
+Resposta (201 Created):
+{
+  "id": 1,
+  "conversation_id": 123,
+  "inbox_id": 456,
+  "title": "Título do agendamento",
+  "content": "Conteúdo da mensagem",
+  "scheduled_at": 1707624000,
+  "status": "pending"
+}
+
+3. ATUALIZAR MENSAGEM AGENDADA
+-----------------------------
+PUT /api/v1/accounts/{account_id}/conversations/{conversation_id}/scheduled_messages/{id}
+
+Corpo da requisição:
+{
+  "inbox_id": 456,
+  "content": "Novo conteúdo da mensagem",
+  "scheduled_at": "2024-02-11T16:00:00Z",
+  "title": "Novo título"
+}
+
+Resposta (200 OK):
+{
+  "id": 1,
+  "conversation_id": 123,
+  "inbox_id": 456,
+  "title": "Novo título",
+  "content": "Novo conteúdo da mensagem",
+  "scheduled_at": 1707624000,
+  "status": "pending"
+}
+
+4. EXCLUIR MENSAGEM AGENDADA
+---------------------------
+DELETE /api/v1/accounts/{account_id}/conversations/{conversation_id}/scheduled_messages/{id}
+
+Resposta (204 No Content)
+
+5. CONTAR MENSAGENS AGENDADAS
+----------------------------
+GET /api/v1/accounts/{account_id}/conversations/{conversation_id}/scheduled_messages/count
+
+Resposta (200 OK):
+{
+  "count": 5
+}
+
+CÓDIGOS DE STATUS
+----------------
+200 OK - Requisição bem-sucedida
+201 Created - Recurso criado com sucesso
+204 No Content - Recurso excluído com sucesso
+400 Bad Request - Parâmetros inválidos
+401 Unauthorized - Não autorizado
+403 Forbidden - Acesso proibido
+404 Not Found - Recurso não encontrado
+422 Unprocessable Entity - Dados inválidos
+
+OBSERVAÇÕES
+-----------
+1. Timestamps são retornados em Unix timestamp (segundos desde epoch)
+2. Datas nas requisições devem estar em formato ISO 8601
+3. Status possíveis:
+   - pending: Mensagem aguardando envio
+   - sent: Mensagem já enviada
+4. Todas as requisições requerem autenticação via token JWT
+5. account_id e conversation_id são obrigatórios em todas as rotas
+
+EXEMPLOS DE USO (cURL)
+---------------------
+# Listar mensagens agendadas
+curl -X GET \
+  'https://seu-chatwoot.com/api/v1/accounts/1/conversations/123/scheduled_messages' \
+  -H 'Authorization: Bearer seu-token'
+
+# Criar mensagem agendada
+curl -X POST \
+  'https://seu-chatwoot.com/api/v1/accounts/1/conversations/123/scheduled_messages' \
+  -H 'Authorization: Bearer seu-token' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "scheduled_message": {
+      "conversation_id": 123,
+      "inbox_id": 456,
+      "content": "Mensagem de teste",
+      "scheduled_at": "2024-02-11T15:00:00Z",
+      "title": "Teste",
+      "status": "pending"
+    }
+  }'

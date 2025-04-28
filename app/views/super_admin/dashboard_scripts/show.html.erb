@@ -1,0 +1,1437 @@
+<% content_for(:title) do %>
+  Modulos StackLab
+<% end %>
+
+<header class="main-content__header" role="banner">
+  <div class="flex justify-between items-center">
+    <h1 class="main-content__page-title" id="page-title">
+      <%= content_for(:title) %>
+    </h1>
+    <%= link_to super_admin_script_gallery_path, class: "px-4 py-2 bg-indigo-500 text-white rounded-md hover:bg-indigo-600" do %>
+      <span class="mr-1">🔎</span> Galeria de Scripts
+    <% end %>
+  </div>
+</header>
+
+<section class="main-content__body">
+  <div class="tabs" id="script-tabs">
+    <div class="tab-nav mb-2 border-b">
+      <button type="button" class="tab-button active px-4 py-2 bg-slate-50 text-slate-700 border-l border-t border-r rounded-t-md -mb-px" data-tab="editor">Editor</button>
+      <button type="button" class="tab-button px-4 py-2 text-slate-600 hover:bg-slate-50" data-tab="preview">Preview</button>
+      <button type="button" class="tab-button px-4 py-2 text-slate-600 hover:bg-slate-50" data-tab="examples">Exemplos</button>
+      <button type="button" class="tab-button px-4 py-2 text-slate-600 hover:bg-slate-50" data-tab="help">Ajuda</button>
+    </div>
+    
+    <div class="tab-content active" data-tab-content="editor">
+      <div class="mb-6">
+        <p class="text-slate-600">
+          Modulos StackLab são injetados no final da tag <code>&lt;body&gt;</code> em todas as páginas do aplicativo. Use-os para personalizar a aparência e comportamento do Chatwoot.
+        </p>
+        <div class="mt-2 p-3 border-l-4 border-yellow-400 bg-yellow-50">
+          <p class="text-yellow-700">
+            <strong>⚠️ Atenção:</strong> Scripts mal formatados podem quebrar o funcionamento do dashboard. Use com cautela.
+          </p>
+        </div>
+      </div>
+
+      <%= form_with url: super_admin_dashboard_scripts_path, method: :post do |form| %>
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="font-medium">Lista de Scripts</h3>
+          <button type="button" id="add-script-btn" class="px-3 py-1 bg-green-50 text-green-700 border border-green-200 rounded-md text-sm">
+            + Adicionar Script
+          </button>
+        </div>
+
+        <div id="scripts-container" class="space-y-4">
+          <!-- Scripts serão adicionados aqui dinamicamente -->
+        </div>
+        
+        <%= form.hidden_field :dashboard_scripts, id: 'combined-scripts' %>
+
+        <div class="p-3 bg-slate-50 rounded-md text-xs text-slate-500 mt-4">
+          Edite seus scripts acima. O código será aplicado em todas as páginas do dashboard.
+        </div>
+
+        <div class="form-actions mt-6">
+          <%= form.submit "Salvar Scripts", class: "px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600" %>
+        </div>
+      <% end %>
+    </div>
+    
+    <div class="tab-content hidden" data-tab-content="preview">
+      <div class="p-3 border rounded-md">
+        <div class="flex flex-col">
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-sm font-medium">Preview do Script Combinado</h3>
+            <button type="button" id="run-preview" class="text-xs px-2 py-1 bg-green-50 text-green-700 border border-green-200 rounded-md">Executar Preview</button>
+          </div>
+          <div class="mb-3">
+          <select id="script-selector" class="border rounded-md px-2 py-1 w-full">
+              <option value="">Visualizar script individual...</option>
+            <!-- Scripts serão adicionados aqui dinamicamente -->
+          </select>
+        </div>
+          </div>
+        <div id="preview-container" class="p-3 bg-slate-50 rounded-md min-h-[300px] overflow-auto">
+          <div class="text-center text-slate-400">
+            Clique em "Executar Preview" para testar o script
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="tab-content hidden" data-tab-content="examples">
+      <div class="p-3 border rounded-md">
+        <h3 class="text-sm font-medium mb-2">Exemplos de Scripts</h3>
+        <div class="space-y-4">
+          <div class="rounded-md border overflow-hidden">
+            <div class="bg-slate-50 p-2 border-b">
+              <h4 class="font-medium text-xs">Customizar cores</h4>
+            </div>
+            <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Cria um elemento de estilo para injetar CSS personalizado
+    const style = document.createElement('style');
+    
+    // Define as cores personalizadas - baseado no sistema de cores do Chatwoot
+    // Estas são as variáveis CSS reais usadas pelo Chatwoot
+    style.innerHTML = `
+      :root {
+        /* Cores primárias - paleta de vermelho */
+        --color-primary-25: 254, 226, 226 !important; /* vermelho claro */
+        --color-primary-50: 254, 202, 202 !important;
+        --color-primary-75: 252, 165, 165 !important;
+        --color-primary-100: 248, 113, 113 !important;
+        --color-primary-200: 239, 68, 68 !important;
+        --color-primary-300: 220, 38, 38 !important;
+        --color-primary-400: 185, 28, 28 !important;
+        --color-primary-500: 153, 27, 27 !important; /* cor principal de botões */
+        --color-primary-600: 127, 29, 29 !important;
+        --color-primary-700: 88, 28, 28 !important;
+        --color-primary-800: 65, 25, 25 !important;
+        --color-primary-900: 41, 22, 22 !important;
+
+        /* Alterar a variável --b-500 que também é usada em elementos interativos */
+        --b-500: #DC2626 !important;
+        --color-woot: #DC2626 !important;
+      }
+      
+      /* Ajustar botões e elementos de navegação */
+      .bg-woot, .bg-primary-500, .btn-primary {
+        background-color: var(--b-500) !important;
+      }
+      
+      /* Ajustar cores de links e elementos interativos */
+      a:not(.button), .text-primary-500 {
+        color: var(--b-500) !important;
+      }
+    `;
+    
+    // Adiciona o estilo ao head do documento para aplicar as mudanças
+    document.head.appendChild(style);
+    console.log('Cores vermelhas aplicadas com sucesso!');
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="cores">Usar este exemplo</button>
+              </div>
+            </div>
+            
+            <div class="rounded-md border overflow-hidden">
+              <div class="bg-slate-50 p-2 border-b">
+                <h4 class="font-medium text-xs">Adicionar menu customizado</h4>
+              </div>
+              <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função para adicionar um novo item de menu na barra lateral
+    function addMenuItem() {
+      // Seleciona o contêiner de navegação principal
+      const sidebarNav = document.querySelector('.sidebar__primary--nav');
+      if (!sidebarNav) return; // Sai da função se o elemento não for encontrado
+      
+      // Cria um novo link para ser adicionado ao menu
+      const newItem = document.createElement('a');
+      newItem.href = 'https://docs.chatwoot.com/';
+      newItem.target = '_blank'; // Abre em nova aba
+      newItem.className = 'sidebar__primary--item'; // Aplica mesmo estilo dos outros itens
+      
+      // Define o conteúdo HTML do item - ícone e texto
+      newItem.innerHTML = `
+        <span class="icon ion-information-circled"></span>
+        <span class="sidebar__primary--title">Documentação</span>
+      `;
+      
+      // Adiciona o novo item ao final do menu
+      sidebarNav.appendChild(newItem);
+    }
+    
+    // Executa imediatamente para tentar adicionar o item ao carregar a página
+    addMenuItem();
+    
+    // Observador de mutações para detectar mudanças dinâmicas no DOM
+    // Isso garante que o item será adicionado mesmo se o menu for carregado
+    // dinamicamente depois que a página inicial renderizar
+    const observer = new MutationObserver(function(mutations) {
+      mutations.forEach(function(mutation) {
+        if (mutation.addedNodes.length) {
+          addMenuItem();
+        }
+      });
+    });
+    
+    // Inicia a observação no corpo do documento
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="menu">Usar este exemplo</button>
+              </div>
+            </div>
+            
+            <div class="rounded-md border overflow-hidden">
+              <div class="bg-slate-50 p-2 border-b">
+                <h4 class="font-medium text-xs">Personalizar KanbanTab</h4>
+              </div>
+              <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função para modificar a aparência visual do Kanban
+    function modifyKanbanUI() {
+      // Cria um elemento de estilo para injetar CSS personalizado
+      const style = document.createElement('style');
+      
+      // Define estilos personalizados para o Kanban
+      // Isso melhora a aparência dos cartões e colunas
+      style.innerHTML = `
+        /* Estilo para as colunas do Kanban - fundo azul claro e cantos arredondados */
+        .kanban-columns > div > div {
+          background-color: #f0f8ff !important;
+          border-radius: 12px !important;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.1) !important;
+        }
+        
+        /* Estilo para os cartões individuais do Kanban */
+        .kanban-item {
+          border-left: 5px solid var(--color-woot) !important; /* Borda colorida à esquerda */
+          background: white !important;
+          transition: transform 0.2s ease !important; /* Animação ao passar o mouse */
+        }
+        /* Efeito de hover com leve elevação */
+        .kanban-item:hover {
+          transform: translateY(-3px) !important;
+        }
+        
+        /* Personalização do spinner de carregamento */
+        .loading-spinner {
+          border-top-color: #ff5722 !important;
+        }
+        
+        /* Suporte ao modo escuro */
+        .dark .kanban-columns > div > div {
+          background-color: #263238 !important;
+        }
+      `;
+      
+      // Adiciona o estilo ao head do documento
+      document.head.appendChild(style);
+    }
+    
+    // Função que verifica se estamos na página do Kanban e aplica as alterações
+    function checkAndApply() {
+      if (window.location.pathname.includes('/kanban')) {
+        // Pequeno atraso para garantir que os elementos do Kanban foram carregados
+        setTimeout(modifyKanbanUI, 1000);
+      }
+    }
+    
+    // Aplicar ao carregar a página
+    checkAndApply();
+    
+    // Intercepta mudanças de navegação para aplicar alterações quando usuário
+    // navegar para a página do Kanban usando o router do frontend
+    const originalPushState = history.pushState;
+    history.pushState = function() {
+      originalPushState.apply(this, arguments);
+      checkAndApply();
+    };
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="kanban">Usar este exemplo</button>
+              </div>
+            </div>
+            
+            <div class="rounded-md border overflow-hidden">
+              <div class="bg-slate-50 p-2 border-b">
+                <h4 class="font-medium text-xs">Branding Completo</h4>
+              </div>
+              <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Função principal para customização completa de branding
+    function aplicarBranding() {
+      // 1. Criar elemento de estilo para injetar CSS personalizado
+      const style = document.createElement('style');
+      
+      // 2. Definir cores principais (primárias, secundárias e tons)
+      style.innerHTML = `
+        /* CORES DA MARCA - Personalize aqui conforme sua identidade visual */
+        :root {
+          /* Cores primárias - substitua por suas cores */
+          --color-primary-25: 236, 252, 203 !important; /* verde claro */
+          --color-primary-50: 217, 249, 157 !important;
+          --color-primary-75: 192, 243, 104 !important;
+          --color-primary-100: 163, 230, 53 !important;
+          --color-primary-200: 132, 204, 22 !important; /* cor principal */
+          --color-primary-300: 101, 163, 13 !important;
+          --color-primary-400: 77, 124, 15 !important;
+          --color-primary-500: 63, 98, 18 !important;
+          --color-primary-600: 54, 83, 20 !important;
+          --color-primary-700: 44, 68, 21 !important;
+          --color-primary-800: 38, 56, 23 !important;
+          --color-primary-900: 30, 44, 23 !important;
+
+          /* Variáveis importantes para botões e elementos interativos */
+          --color-woot: #84CC16 !important; /* verde limão */
+          --b-500: #84CC16 !important;
+        }
+        
+        /* CUSTOMIZAÇÃO DOS ELEMENTOS BÁSICOS */
+        /* Botões, fundo de navegação, etc. */
+        .bg-woot, .bg-primary-500, .btn-primary, 
+        .conv-header, button.primary, .wizard-box__header {
+          background-color: var(--color-woot) !important;
+        }
+        
+        /* Links e textos destacados */
+        a:not(.button), .text-primary-500, .text-woot {
+          color: var(--color-woot) !important;
+        }
+        
+        /* Bordas e elementos de highlight */
+        .primary-border, .active-item {
+          border-color: var(--color-woot) !important;
+        }
+        
+        /* Customização da navegação lateral */
+        .sidebar {
+          background: linear-gradient(180deg, #263133 0%, #1c2425 100%) !important;
+        }
+        
+        /* Customização da barra superior */
+        .header-wrap {
+          border-bottom: 1px solid rgba(132, 204, 22, 0.1) !important;
+        }
+      `;
+      
+      // 3. Adicionar o estilo ao head do documento
+      document.head.appendChild(style);
+      
+      // 4. Personalizar o logotipo (se estiver na página correta)
+      setTimeout(function() {
+        // Substituir logo
+        const logoImgs = document.querySelectorAll('.logo img, .sidebar img');
+        
+        // URL do seu logo (substitua pela URL do seu logo)
+        const novoLogo = 'https://cdn-icons-png.flaticon.com/512/6295/6295417.png';
+        
+        logoImgs.forEach(function(img) {
+          img.src = novoLogo;
+        });
+        
+        console.log('Branding completo aplicado com sucesso!');
+      }, 500);
+    }
+    
+    // Executar imediatamente 
+    aplicarBranding();
+    
+    // Também executar quando houver mudanças dinâmicas na DOM
+    const observer = new MutationObserver(function(mutations) {
+      aplicarBranding();
+    });
+    
+    observer.observe(document.body, { childList: true, subtree: true });
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="branding">Usar este exemplo</button>
+              </div>
+            </div>
+            
+            <div class="rounded-md border overflow-hidden">
+              <div class="bg-slate-50 p-2 border-b">
+                <h4 class="font-medium text-xs">Personalizar Fonte do Sistema</h4>
+              </div>
+              <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // 1. Adicionar fonte Google personalizada
+    const fontLink = document.createElement('link');
+    fontLink.rel = 'stylesheet';
+    fontLink.href = 'https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700&display=swap';
+    document.head.appendChild(fontLink);
+    
+    // 2. Criar elemento de estilo para aplicar a fonte
+    const style = document.createElement('style');
+    
+    // 3. Definir a fonte para todos os elementos
+    style.innerHTML = `
+      /* Aplicar fonte personalizada a todo o sistema */
+      body, h1, h2, h3, h4, h5, h6, p, button, 
+      input, select, textarea, .dropdown-menu, .sidebar {
+        font-family: 'Nunito', sans-serif !important;
+      }
+      
+      /* Personalizar peso das fontes */
+      h1, h2, h3, .heading {
+        font-weight: 700 !important;
+      }
+      
+      /* Ajustar espaçamento */
+      .text-sm, .text-xs {
+        letter-spacing: 0.01em !important;
+      }
+    `;
+    
+    // 4. Adicionar o estilo ao head do documento
+    document.head.appendChild(style);
+    
+    console.log('Fonte personalizada aplicada com sucesso!');
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="fontes">Usar este exemplo</button>
+              </div>
+            </div>
+            
+            <div class="rounded-md border overflow-hidden">
+              <div class="bg-slate-50 p-2 border-b">
+                <h4 class="font-medium text-xs">Modo Escuro Customizado</h4>
+              </div>
+              <pre class="text-xs font-mono p-3 overflow-auto"><code>&lt;script&gt;
+  document.addEventListener('DOMContentLoaded', function() {
+    // Criar elemento de estilo para o modo escuro
+    const style = document.createElement('style');
+    
+    // Definir estilos para o modo escuro personalizado
+    style.innerHTML = `
+      /* Estilos específicos para o modo escuro */
+      html[data-theme='dark'], .dark-mode {
+        /* Cores de fundo mais agradáveis */
+        --dark-mode-bg: #121212 !important;
+        --dark-mode-card-bg: #1e1e1e !important;
+        
+        /* Textos mais legíveis */
+        --dark-mode-text: #e0e0e0 !important;
+      }
+      
+      /* Customização de elementos específicos */
+      html[data-theme='dark'] .card, .dark-mode .card {
+        background-color: #1e1e1e !important;
+        border-color: #333 !important;
+      }
+      
+      html[data-theme='dark'] .conversation-panel, .dark-mode .conversation-panel {
+        background-color: #161616 !important;
+      }
+      
+      /* Melhorar bordas e separadores */
+      html[data-theme='dark'] .border, .dark-mode .border {
+        border-color: #333 !important;
+      }
+    `;
+    
+    // Adicionar o estilo ao head do documento
+    document.head.appendChild(style);
+    
+    console.log('Modo escuro personalizado aplicado!');
+  });
+&lt;/script&gt;</code></pre>
+              <div class="border-t p-2 bg-slate-50">
+                <button type="button" class="use-example text-xs px-2 py-1 text-slate-600 border rounded-md" data-example="darkmode">Usar este exemplo</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="tab-content hidden" data-tab-content="help">
+        <div class="p-3 border rounded-md space-y-4">
+          <div>
+            <h3 class="text-sm font-medium mb-2">O que são Modulos StackLab?</h3>
+            <p class="text-sm text-slate-600">
+              Modulos StackLab são snippets de HTML/JavaScript que são injetados no final da tag &lt;body&gt; em todas as páginas do dashboard do Chatwoot. 
+              Eles permitem personalizar a aparência e funcionalidade do Chatwoot sem modificar o código-fonte.
+            </p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium mb-2">Dicas de Segurança</h3>
+            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+              <li>Sempre envolva seu código em uma verificação DOMContentLoaded para garantir que o DOM esteja carregado</li>
+              <li>Evite scripts que bloqueiam a renderização da página</li>
+              <li>Teste seus scripts em um ambiente não-produtivo antes de aplicar</li>
+              <li>Use seletores CSS específicos para evitar conflitos</li>
+              <li>Não use para injetar scripts de terceiros não confiáveis</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium mb-2">Casos de Uso Comuns</h3>
+            <ul class="list-disc pl-5 text-sm text-slate-600 space-y-1">
+              <li>Personalização de cores e estilos</li>
+              <li>Adição de funcionalidades customizadas</li>
+              <li>Integração com ferramentas de analytics</li>
+              <li>Criar atalhos de teclado personalizados</li>
+              <li>Melhorar a acessibilidade</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Template para novos scripts -->
+<template id="script-template">
+  <div class="script-item border rounded-md overflow-hidden">
+    <div class="p-3 bg-slate-50 border-b flex justify-between items-center cursor-pointer script-header">
+      <div class="flex items-center">
+        <span class="toggle-icon mr-2">▶</span>
+        <input type="text" class="script-name mr-2 px-2 py-1 border rounded text-sm w-64" placeholder="Nome do script" value="Script">
+      </div>
+      <div class="flex items-center space-x-2">
+        <select class="script-type text-xs px-2 py-1 border rounded bg-white mr-2">
+          <option value="function">Função</option>
+          <option value="component">Componente</option>
+          <option value="style">Estilo</option>
+        </select>
+        <span class="text-xs text-slate-500">Ordem:</span>
+        <button type="button" class="move-up px-2 py-1 text-xs bg-slate-100 border rounded">↑</button>
+        <button type="button" class="move-down px-2 py-1 text-xs bg-slate-100 border rounded">↓</button>
+        <button type="button" class="delete-script px-2 py-1 text-xs bg-red-50 text-red-700 border border-red-200 rounded">Remover</button>
+      </div>
+    </div>
+    <div class="script-content-wrapper hidden">
+      <div>
+        <textarea class="script-content w-full border-0 font-mono text-sm p-3" rows="8" wrap="off" placeholder='<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    // Seu código aqui
+  });
+</script>'></textarea>
+      </div>
+      <div class="p-3 bg-slate-50 border-t">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center">
+            <span class="text-xs text-slate-500 mr-2">Pacotes:</span>
+            <div class="packages-container flex flex-wrap gap-1"></div>
+          </div>
+          <div class="flex items-center">
+            <input type="text" class="package-input mr-1 px-2 py-1 text-xs border rounded w-40" placeholder="nome-pacote@versão">
+            <button type="button" class="add-package px-2 py-1 text-xs bg-blue-100 text-blue-700 border border-blue-200 rounded">+ Adicionar</button>
+            <div class="flex items-center ml-3 script-switch">
+              <span class="text-xs text-slate-500 mr-1">Ativo:</span>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" class="script-active sr-only peer" checked>
+                <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Tab navigation
+  document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', function() {
+      const tabName = this.dataset.tab;
+      
+      // Update active tab button
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active', 'bg-slate-50', 'text-slate-700', 'border-l', 'border-t', 'border-r', 'rounded-t-md', '-mb-px');
+        btn.classList.add('text-slate-600', 'hover:bg-slate-50');
+      });
+      this.classList.add('active', 'bg-slate-50', 'text-slate-700', 'border-l', 'border-t', 'border-r', 'rounded-t-md', '-mb-px');
+      this.classList.remove('text-slate-600', 'hover:bg-slate-50');
+      
+      // Show active tab content
+      document.querySelectorAll('.tab-content').forEach(content => {
+        if (content.dataset.tabContent === tabName) {
+          content.classList.remove('hidden');
+          content.classList.add('active');
+        } else {
+          content.classList.add('hidden');
+          content.classList.remove('active');
+        }
+      });
+    });
+  });
+  
+  // Função para alternar a expansão/colapso de um script
+  function toggleScript(scriptHeader) {
+    const scriptItem = scriptHeader.closest('.script-item');
+    const contentWrapper = scriptItem.querySelector('.script-content-wrapper');
+    const toggleIcon = scriptHeader.querySelector('.toggle-icon');
+    
+    if (contentWrapper.classList.contains('hidden')) {
+      contentWrapper.classList.remove('hidden');
+      toggleIcon.textContent = '▼';
+    } else {
+      contentWrapper.classList.add('hidden');
+      toggleIcon.textContent = '▶';
+    }
+  }
+  
+  // Adicionar evento de clique aos cabeçalhos de script (delegação de eventos)
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('.script-header')) {
+      const scriptHeader = e.target.closest('.script-header');
+      // Evitar ativação do toggle quando clicar em inputs ou botões
+      if (!e.target.closest('input') && !e.target.closest('button')) {
+        toggleScript(scriptHeader);
+      }
+    }
+  });
+  
+  // Run preview button
+  document.getElementById('run-preview').addEventListener('click', function() {
+    const scriptContent = document.getElementById('combined-scripts').value;
+    const previewContainer = document.getElementById('preview-container');
+    
+    // Clear previous preview
+    previewContainer.innerHTML = '<div class="p-3 bg-white rounded-md shadow-sm">Preview em execução...</div>';
+    
+    try {
+      // Create sandbox iframe for the preview
+      const iframe = document.createElement('iframe');
+      iframe.style.width = '100%';
+      iframe.style.height = '500px'; // Aumentei a altura para melhor visualização
+      iframe.style.border = 'none';
+      
+      // Definir a URL da página inicial do app
+      iframe.src = '/app/accounts/1/dashboard';
+      
+      // Adicionar os scripts após o carregamento da página
+      iframe.onload = function() {
+        try {
+          // Obtém o documento dentro do iframe
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          
+          // Cria um elemento de script para injetar o código do usuário
+          const script = iframeDoc.createElement('script');
+          
+          // Remove as tags de script do conteúdo (se existirem)
+          const cleanScriptContent = scriptContent.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "$1").trim();
+          
+          // Adiciona o código do script
+          script.textContent = `
+            // Configuração para capturar logs e erros
+            (function() {
+              // Criar elemento para exibir logs
+              const logContainer = document.createElement('div');
+              logContainer.id = 'script-log-container';
+              logContainer.style.position = 'fixed';
+              logContainer.style.bottom = '10px';
+              logContainer.style.right = '10px';
+              logContainer.style.width = '300px';
+              logContainer.style.maxHeight = '200px';
+              logContainer.style.overflowY = 'auto';
+              logContainer.style.background = 'rgba(0,0,0,0.8)';
+              logContainer.style.color = 'white';
+              logContainer.style.padding = '10px';
+              logContainer.style.borderRadius = '5px';
+              logContainer.style.zIndex = '9999';
+              logContainer.style.fontSize = '12px';
+              logContainer.style.fontFamily = 'monospace';
+              
+              // Adicionar título
+              const title = document.createElement('div');
+              title.textContent = 'Console do Script';
+              title.style.borderBottom = '1px solid #444';
+              title.style.paddingBottom = '5px';
+              title.style.marginBottom = '5px';
+              logContainer.appendChild(title);
+              
+              document.body.appendChild(logContainer);
+              
+              // Sobrescrever console.log
+              const originalLog = console.log;
+              console.log = function() {
+                const args = Array.from(arguments);
+                const logEntry = document.createElement('div');
+                logEntry.textContent = '> ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+                logEntry.style.borderBottom = '1px dotted #333';
+                logEntry.style.paddingBottom = '3px';
+                logEntry.style.marginBottom = '3px';
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                originalLog.apply(console, arguments);
+              };
+              
+              // Sobrescrever console.error
+              const originalError = console.error;
+              console.error = function() {
+                const args = Array.from(arguments);
+                const logEntry = document.createElement('div');
+                logEntry.textContent = '❌ ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+                logEntry.style.color = '#ff5252';
+                logEntry.style.borderBottom = '1px dotted #333';
+                logEntry.style.paddingBottom = '3px';
+                logEntry.style.marginBottom = '3px';
+                logContainer.appendChild(logEntry);
+                logContainer.scrollTop = logContainer.scrollHeight;
+                originalError.apply(console, arguments);
+              };
+              
+              // Capturar erros não tratados
+              window.addEventListener('error', function(e) {
+                console.error('Erro JS:', e.message);
+                return false;
+              });
+              
+              console.log('Ambiente de scripts inicializado');
+            })();
+            
+            // Script do usuário
+            try {
+              ${cleanScriptContent}
+              console.log('Script executado com sucesso!');
+            } catch (error) {
+              console.error('Erro no script:', error.message);
+            }
+          `;
+          
+          // Adiciona o script no final do body
+          iframeDoc.body.appendChild(script);
+          
+          // Atualiza o status
+          const statusBar = document.createElement('div');
+          statusBar.style.padding = '8px';
+          statusBar.style.backgroundColor = '#f0f9ff';
+          statusBar.style.borderRadius = '4px';
+          statusBar.style.marginTop = '8px';
+          statusBar.style.fontSize = '14px';
+          statusBar.style.color = '#0369a1';
+          statusBar.innerHTML = '✅ Script aplicado à página <strong>/app/accounts/1/dashboard</strong>';
+          previewContainer.appendChild(statusBar);
+          
+        } catch (error) {
+          const errorMsg = document.createElement('div');
+          errorMsg.style.padding = '8px';
+          errorMsg.style.backgroundColor = '#fef2f2';
+          errorMsg.style.borderRadius = '4px';
+          errorMsg.style.marginTop = '8px';
+          errorMsg.style.fontSize = '14px';
+          errorMsg.style.color = '#b91c1c';
+          errorMsg.innerHTML = '❌ Erro ao injetar script: ' + error.message;
+          previewContainer.appendChild(errorMsg);
+        }
+      };
+      
+      previewContainer.innerHTML = '';
+      previewContainer.appendChild(iframe);
+    } catch (error) {
+      // Usar string simples em vez de template literals
+      previewContainer.innerHTML = '<div class="p-3 bg-red-50 text-red-700 rounded-md">' +
+        '<p><strong>Erro ao executar preview:</strong></p>' +
+        '<p>' + error.message + '</p>' +
+        '</div>';
+    }
+  });
+  
+  // Use example buttons
+  document.querySelectorAll('.use-example').forEach(button => {
+    button.addEventListener('click', function() {
+      const exampleKey = this.dataset.example;
+      const exampleTitle = this.closest('.rounded-md').querySelector('.font-medium').textContent;
+      
+      // Adiciona o exemplo como um novo script
+      addScript(examples[exampleKey], exampleTitle);
+      
+      // Switch to editor tab
+      document.querySelector('.tab-button[data-tab="editor"]').click();
+    });
+  });
+
+  // Script management
+  const scriptsContainer = document.getElementById('scripts-container');
+  const addScriptBtn = document.getElementById('add-script-btn');
+  const scriptTemplate = document.getElementById('script-template');
+  const combinedScriptsField = document.getElementById('combined-scripts');
+  
+  // Função para gerar um ID único
+  function generateUniqueId() {
+    return 'script-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
+  }
+  
+  // Função para adicionar um pacote ao script
+  function handlePackageInstallation(scriptItem) {
+    const packageInput = scriptItem.querySelector('.package-input');
+    const addPackageBtn = scriptItem.querySelector('.add-package');
+    const packagesContainer = scriptItem.querySelector('.packages-container');
+    const scriptContent = scriptItem.querySelector('.script-content');
+    
+    if (!addPackageBtn) return;
+    
+    addPackageBtn.addEventListener('click', async function() {
+      const packageName = packageInput.value.trim();
+      if (!packageName) return;
+      
+      // Verificar se o pacote já está adicionado
+      if (scriptItem.packages && scriptItem.packages.includes(packageName)) {
+        alert('Este pacote já foi adicionado');
+        return;
+      }
+      
+      // Validar se o pacote existe
+      try {
+        // Tentar carregar o pacote via CDN para verificar se existe
+        const importURL = `https://unpkg.com/${packageName}?module`;
+        addPackageBtn.textContent = 'Verificando...';
+        addPackageBtn.disabled = true;
+        
+        try {
+          await fetch(importURL, { method: 'HEAD' });
+        } catch (error) {
+          throw new Error('Pacote não encontrado');
+        }
+        
+        // Adicionar pacote à lista
+        scriptItem.packages = scriptItem.packages || [];
+        scriptItem.packages.push(packageName);
+        
+        // Adicionar tag visual
+        const tag = document.createElement('span');
+        tag.className = 'px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full flex items-center';
+        tag.innerHTML = `
+          ${packageName}
+          <button class="ml-1 text-xs text-blue-500 hover:text-blue-700" data-package="${packageName}">×</button>
+        `;
+        packagesContainer.appendChild(tag);
+        
+        // Limpar input
+        packageInput.value = '';
+        
+        // Modificar o conteúdo do script para incluir import do pacote
+        let content = scriptContent.value;
+        
+        // Verificar se o script já tem algum import
+        if (!content.includes('import') && !content.includes('// Imports')) {
+          // Adicionar seção de imports no início do script
+          if (content.includes('<script>')) {
+            content = content.replace('<script>', '<script data-packages="' + scriptItem.packages.join(',') + '">\n// Imports\nimport { } from "https://unpkg.com/' + packageName + '?module";\n');
+          } else {
+            content = '<script data-packages="' + scriptItem.packages.join(',') + '">\n// Imports\nimport { } from "https://unpkg.com/' + packageName + '?module";\n\n' + content;
+          }
+        } else {
+          // Adicionar novo import à seção existente
+          // Atualizar o atributo data-packages
+          content = content.replace(/<script([^>]*)>/, function(match, attributes) {
+            if (attributes.includes('data-packages=')) {
+              return match.replace(/data-packages="([^"]*)"/, 'data-packages="' + scriptItem.packages.join(',') + '"');
+            } else {
+              return '<script data-packages="' + scriptItem.packages.join(',') + '"' + attributes + '>';
+            }
+          });
+          
+          // Adicionar a linha de import
+          content = content.replace(/\/\/ Imports[^\n]*\n/, '// Imports\nimport { } from "https://unpkg.com/' + packageName + '?module";\n');
+        }
+        
+        scriptContent.value = content;
+        
+        // Atualizar o script combinado
+        updateCombinedScripts();
+        
+        addPackageBtn.textContent = '+ Adicionar';
+        addPackageBtn.disabled = false;
+      } catch (error) {
+        alert('Erro ao adicionar pacote: ' + error.message);
+        addPackageBtn.textContent = '+ Adicionar';
+        addPackageBtn.disabled = false;
+      }
+    });
+    
+    // Remover pacote quando clicar no X
+    packagesContainer.addEventListener('click', function(e) {
+      if (e.target.tagName === 'BUTTON' && e.target.dataset.package) {
+        const packageToRemove = e.target.dataset.package;
+        
+        // Remover da lista
+        scriptItem.packages = scriptItem.packages.filter(pkg => pkg !== packageToRemove);
+        
+        // Remover tag visual
+        e.target.parentElement.remove();
+        
+        // Atualizar o conteúdo do script
+        let content = scriptContent.value;
+        
+        // Remover a linha de import
+        content = content.replace(new RegExp(`import\\s+\\{[^}]*\\}\\s+from\\s+"https://unpkg.com/${packageToRemove}\\?module";\\n?`), '');
+        
+        // Atualizar o atributo data-packages
+        if (scriptItem.packages.length > 0) {
+          content = content.replace(/data-packages="[^"]*"/, 'data-packages="' + scriptItem.packages.join(',') + '"');
+        } else {
+          content = content.replace(/data-packages="[^"]*"/, '');
+          // Remover a seção de imports se estiver vazia
+          content = content.replace(/\/\/ Imports\n/, '');
+        }
+        
+        scriptContent.value = content;
+        
+        // Atualizar o script combinado
+        updateCombinedScripts();
+      }
+    });
+  }
+  
+  // Função para adicionar um novo script
+  function addScript(content = '', name = 'Script', type = 'function', isActive = true) {
+    const scriptId = generateUniqueId();
+    const newScript = document.importNode(scriptTemplate.content, true).firstElementChild;
+    newScript.setAttribute('data-id', scriptId);
+    
+    const nameInput = newScript.querySelector('.script-name');
+    nameInput.value = name;
+    
+    const typeSelect = newScript.querySelector('.script-type');
+    if (type && ['function', 'component', 'style'].includes(type)) {
+      typeSelect.value = type;
+    }
+    
+    const contentTextarea = newScript.querySelector('.script-content');
+    contentTextarea.value = content;
+    
+    // Verificar se o script está ativo
+    const activeSwitch = newScript.querySelector('.script-active');
+    activeSwitch.checked = isActive;
+    
+    // Atualizar classe visual se estiver desativado
+    if (!isActive) {
+      newScript.classList.add('opacity-50');
+    }
+    
+    // Inicializar pacotes
+    newScript.packages = [];
+    
+    // Extrair pacotes do atributo data-packages
+    if (content.includes('data-packages="')) {
+      const match = content.match(/data-packages="([^"]+)"/);
+      if (match && match[1]) {
+        newScript.packages = match[1].split(',');
+        
+        // Criar tags para os pacotes
+        const packagesContainer = newScript.querySelector('.packages-container');
+        newScript.packages.forEach(packageName => {
+          const tag = document.createElement('span');
+          tag.className = 'px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full flex items-center';
+          tag.innerHTML = `
+            ${packageName}
+            <button class="ml-1 text-xs text-blue-500 hover:text-blue-700" data-package="${packageName}">×</button>
+          `;
+          packagesContainer.appendChild(tag);
+        });
+      }
+    }
+    
+    // Adicionar event listeners
+    newScript.querySelector('.move-up').addEventListener('click', () => moveScript(scriptId, 'up'));
+    newScript.querySelector('.move-down').addEventListener('click', () => moveScript(scriptId, 'down'));
+    newScript.querySelector('.delete-script').addEventListener('click', () => deleteScript(scriptId));
+    
+    // Adicionar gerenciamento de pacotes
+    handlePackageInstallation(newScript);
+    
+    // Adicionar listener para o switch de ativar/desativar
+    newScript.querySelector('.script-active').addEventListener('change', function() {
+      if (this.checked) {
+        newScript.classList.remove('opacity-50');
+      } else {
+        newScript.classList.add('opacity-50');
+      }
+      updateCombinedScripts();
+    });
+    
+    // Adicionar ao container
+    scriptsContainer.appendChild(newScript);
+    updateCombinedScripts();
+  }
+  
+  // Função para mover um script para cima ou para baixo
+  function moveScript(scriptId, direction) {
+    const scriptElement = document.querySelector(`.script-item[data-id="${scriptId}"]`);
+    if (!scriptElement) return;
+    
+    if (direction === 'up' && scriptElement.previousElementSibling) {
+      scriptsContainer.insertBefore(scriptElement, scriptElement.previousElementSibling);
+    } else if (direction === 'down' && scriptElement.nextElementSibling) {
+      scriptsContainer.insertBefore(scriptElement.nextElementSibling, scriptElement);
+    }
+    
+    updateCombinedScripts();
+  }
+  
+  // Função para excluir um script
+  function deleteScript(scriptId) {
+    const scriptElement = document.querySelector(`.script-item[data-id="${scriptId}"]`);
+    if (scriptElement && confirm('Tem certeza que deseja remover este script?')) {
+      scriptElement.remove();
+      updateCombinedScripts();
+    }
+  }
+  
+  // Função para atualizar o campo hidden com todos os scripts combinados
+  function updateCombinedScripts() {
+    const scripts = document.querySelectorAll('.script-item');
+    let combinedContent = '';
+    
+    // Também atualizar o seletor de scripts
+    updateScriptSelector();
+    
+    scripts.forEach(script => {
+      const scriptContent = script.querySelector('.script-content').value.trim();
+      const scriptName = script.querySelector('.script-name').value.trim();
+      const scriptType = script.querySelector('.script-type').value;
+      const isActive = script.querySelector('.script-active').checked;
+      
+      if (scriptContent) {
+        // Adiciona o nome, tipo e estado ativo como atributos no script
+        let scriptWithAttrs = scriptContent.replace(/<script/i, `<script data-name="${scriptName}" data-type="${scriptType}"`);
+        
+        // Adicionar ou atualizar o atributo data-active
+        if (!isActive) {
+          scriptWithAttrs = scriptWithAttrs.replace(/<script([^>]*)>/i, `<script$1 data-active="false">`);
+        } else {
+          // Remover data-active="false" se existir
+          scriptWithAttrs = scriptWithAttrs.replace(/data-active="false"/i, '');
+        }
+        
+        // Adicionar sempre ao combinedContent independente de estar ativo ou não
+        // A diferença é que apenas os ativos serão executados no dashboard
+        combinedContent += scriptWithAttrs + '\n\n';
+      }
+    });
+    
+    combinedScriptsField.value = combinedContent.trim();
+  }
+  
+  // Função para atualizar o seletor de scripts na aba de preview
+  function updateScriptSelector() {
+    const selector = document.getElementById('script-selector');
+    if (!selector) return;
+    
+    const scripts = document.querySelectorAll('.script-item');
+    
+    // Salvar a seleção atual
+    const currentSelection = selector.value;
+    
+    // Limpar as opções, mantendo apenas a primeira
+    while (selector.options.length > 1) {
+      selector.remove(1);
+    }
+    
+    // Adicionar cada script como uma opção
+    scripts.forEach((script, index) => {
+      const scriptName = script.querySelector('.script-name').value.trim() || `Script ${index + 1}`;
+      const scriptId = script.getAttribute('data-id');
+      
+      const option = document.createElement('option');
+      option.value = scriptId;
+      option.textContent = scriptName;
+      selector.appendChild(option);
+    });
+    
+    // Restaurar a seleção anterior, se possível
+    if (currentSelection) {
+      selector.value = currentSelection;
+    }
+  }
+  
+  // Função para renderizar um script específico no preview
+  function renderSingleScriptPreview(scriptId) {
+    const previewContainer = document.getElementById('preview-container');
+    
+    if (!scriptId) {
+      previewContainer.innerHTML = '<div class="text-center text-slate-400 p-3">Selecione um script para visualizar sua renderização</div>';
+      return;
+    }
+    
+    const scriptElement = document.querySelector(`.script-item[data-id="${scriptId}"]`);
+    if (!scriptElement) return;
+    
+    const scriptContent = scriptElement.querySelector('.script-content').value.trim();
+    if (!scriptContent) {
+      previewContainer.innerHTML = '<div class="text-center text-slate-400 p-3">O script selecionado está vazio</div>';
+      return;
+    }
+    
+    // Limpar o container
+    previewContainer.innerHTML = '<div class="text-center text-slate-400 p-3">Carregando preview...</div>';
+    
+    // Criar o iframe com a página do dashboard
+    const iframe = document.createElement('iframe');
+    iframe.style.width = '100%';
+    iframe.style.height = '300px';
+    iframe.style.border = 'none';
+    iframe.src = '/app/accounts/1/dashboard';
+    
+    // Injetar o script após o carregamento da página
+    iframe.onload = function() {
+      try {
+        // Obtém o documento dentro do iframe
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        
+        // Cria um elemento de script para injetar o código do usuário
+        const script = iframeDoc.createElement('script');
+        
+        // Remove as tags de script do conteúdo (se existirem)
+        const cleanScriptContent = scriptContent.replace(/<script[^>]*>([\s\S]*?)<\/script>/gi, "$1").trim();
+        
+        // Adiciona o código do script
+        script.textContent = `
+          // Configuração para capturar logs e erros
+          (function() {
+            // Criar elemento para exibir logs
+            const logContainer = document.createElement('div');
+            logContainer.id = 'script-log-container';
+            logContainer.style.position = 'fixed';
+            logContainer.style.bottom = '10px';
+            logContainer.style.right = '10px';
+            logContainer.style.width = '300px';
+            logContainer.style.maxHeight = '200px';
+            logContainer.style.overflowY = 'auto';
+            logContainer.style.background = 'rgba(0,0,0,0.8)';
+            logContainer.style.color = 'white';
+            logContainer.style.padding = '10px';
+            logContainer.style.borderRadius = '5px';
+            logContainer.style.zIndex = '9999';
+            logContainer.style.fontSize = '12px';
+            logContainer.style.fontFamily = 'monospace';
+            
+            // Adicionar título
+            const title = document.createElement('div');
+            title.textContent = 'Console do Script';
+            title.style.borderBottom = '1px solid #444';
+            title.style.paddingBottom = '5px';
+            title.style.marginBottom = '5px';
+            logContainer.appendChild(title);
+            
+            document.body.appendChild(logContainer);
+            
+            // Sobrescrever console.log
+            const originalLog = console.log;
+            console.log = function() {
+              const args = Array.from(arguments);
+              const logEntry = document.createElement('div');
+              logEntry.textContent = '> ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+              logEntry.style.borderBottom = '1px dotted #333';
+              logEntry.style.paddingBottom = '3px';
+              logEntry.style.marginBottom = '3px';
+              logContainer.appendChild(logEntry);
+              logContainer.scrollTop = logContainer.scrollHeight;
+              originalLog.apply(console, arguments);
+            };
+            
+            // Sobrescrever console.error
+            const originalError = console.error;
+            console.error = function() {
+              const args = Array.from(arguments);
+              const logEntry = document.createElement('div');
+              logEntry.textContent = '❌ ' + args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : arg).join(' ');
+              logEntry.style.color = '#ff5252';
+              logEntry.style.borderBottom = '1px dotted #333';
+              logEntry.style.paddingBottom = '3px';
+              logEntry.style.marginBottom = '3px';
+              logContainer.appendChild(logEntry);
+              logContainer.scrollTop = logContainer.scrollHeight;
+              originalError.apply(console, arguments);
+            };
+            
+            // Capturar erros não tratados
+            window.addEventListener('error', function(e) {
+              console.error('Erro JS:', e.message);
+              return false;
+            });
+            
+            console.log('Ambiente de scripts inicializado');
+          })();
+          
+          // Script do usuário
+          try {
+            ${cleanScriptContent}
+            console.log('Script executado com sucesso!');
+          } catch (error) {
+            console.error('Erro no script:', error.message);
+          }
+        `;
+        
+        // Adiciona o script no final do body
+        iframeDoc.body.appendChild(script);
+        
+        // Adiciona informação sobre o script sendo exibido
+        const scriptName = scriptElement.querySelector('.script-name').value.trim() || 'Script sem nome';
+        const statusBar = document.createElement('div');
+        statusBar.style.padding = '8px';
+        statusBar.style.backgroundColor = '#f0f9ff';
+        statusBar.style.borderRadius = '4px';
+        statusBar.style.marginTop = '8px';
+        statusBar.style.fontSize = '14px';
+        statusBar.style.color = '#0369a1';
+        statusBar.innerHTML = `✅ Script individual aplicado: <strong>${scriptName}</strong>`;
+        previewContainer.appendChild(statusBar);
+        
+      } catch (error) {
+        previewContainer.innerHTML = '<div class="p-3 bg-red-50 text-red-700 rounded-md">' +
+          '<p><strong>Erro ao executar preview:</strong></p>' +
+          '<p>' + error.message + '</p>' +
+          '</div>';
+      }
+    };
+    
+    previewContainer.innerHTML = '';
+    previewContainer.appendChild(iframe);
+  }
+  
+  // Seletor de scripts
+  const scriptSelector = document.getElementById('script-selector');
+  if (scriptSelector) {
+    scriptSelector.addEventListener('change', function() {
+      if (this.value) {
+      renderSingleScriptPreview(this.value);
+      } else {
+        // Limpar o preview quando selecionar a opção vazia
+        document.getElementById('preview-container').innerHTML = '<div class="text-center text-slate-400 p-3">Clique em "Executar Preview" para testar o script</div>';
+      }
+    });
+  }
+  
+  // Evento para adicionar um novo script
+  addScriptBtn.addEventListener('click', () => addScript());
+  
+  // Observer para detectar mudanças nos conteúdos dos scripts
+  const observer = new MutationObserver(updateCombinedScripts);
+  observer.observe(scriptsContainer, { childList: true, subtree: true });
+  
+  // Event listener para detectar mudanças nos textareas
+  scriptsContainer.addEventListener('input', function(e) {
+    if (e.target.classList.contains('script-content') || 
+        e.target.classList.contains('script-name')) {
+      updateCombinedScripts();
+    }
+  });
+  
+  // Inicializar com um script vazio ou com o script existente
+  const existingScripts = <%= raw @dashboard_scripts.to_json %>;
+  if (existingScripts) {
+    // Verificar se contém um ou mais HTMLs completos
+    const hasCompleteHTML = /<(!DOCTYPE|html|body)[\s>]/i.test(existingScripts);
+    
+    if (hasCompleteHTML) {
+      // Verificar se existem múltiplos documentos HTML
+      const htmlDocs = existingScripts.split(/<!DOCTYPE/i).filter(part => part.trim());
+      
+      if (htmlDocs.length > 1) {
+        // Temos múltiplos documentos HTML
+        htmlDocs.forEach((doc, index) => {
+          // Adicionar DOCTYPE de volta se não for o primeiro fragmento
+          const fullDoc = index > 0 ? '<!DOCTYPE' + doc : doc;
+          
+          // Extrair o data-name
+          let htmlName = `HTML Completo ${index + 1}`;
+          const dataNameMatch = fullDoc.match(/data-name="([^"]+)"/);
+          if (dataNameMatch && dataNameMatch[1]) {
+            htmlName = dataNameMatch[1];
+          }
+          
+          // Adicionar como um script separado
+          addScript(fullDoc, htmlName, 'component');
+        });
+      } else {
+        // Um único HTML completo
+        let htmlName = 'HTML Completo';
+        const dataNameMatch = existingScripts.match(/data-name="([^"]+)"/);
+        if (dataNameMatch && dataNameMatch[1]) {
+          htmlName = dataNameMatch[1];
+        }
+        
+        // Se for HTML completo, manter como um único script
+        addScript(existingScripts, htmlName, 'component');
+      }
+    } else {
+      // Tenta dividir o script existente em múltiplos scripts
+      const scriptParts = existingScripts.split(/(<script[\s\S]*?<\/script>)/gi)
+        .filter(part => part.trim().startsWith('<script'));
+      
+      if (scriptParts.length > 0) {
+        scriptParts.forEach((part, index) => {
+          // Tenta extrair o nome do atributo data-name
+          const nameMatch = part.match(/data-name="([^"]+)"/);
+          const scriptName = nameMatch ? nameMatch[1] : `Script ${index + 1}`;
+          
+          // Tenta extrair o tipo do atributo data-type
+          const typeMatch = part.match(/data-type="([^"]+)"/);
+          const scriptType = typeMatch ? typeMatch[1] : 'function';
+          
+          // Verifica se o script está ativo
+          const isActiveMatch = part.match(/data-active="false"/);
+          const isActive = !isActiveMatch;
+          
+          // Adiciona o script com o status correto de ativação
+          addScript(part, scriptName, scriptType, isActive);
+        });
+      }
+    }
+  } else {
+    // Se não existir nenhum script, adiciona um vazio
+    addScript();
+  }
+});
+</script>
+
+<script>
+// Listener para receber script importado da galeria
+window.addEventListener('message', function(event) {
+  if (event.data && event.data.type === 'IMPORT_SCRIPT') {
+    const script = event.data.script;
+    const name = event.data.name;
+    
+    // Verificar se a função addScript está disponível
+    if (typeof addScript === 'function') {
+      addScript(script, name);
+      
+      // Mudar para a aba do editor
+      document.querySelector('.tab-button[data-tab="editor"]').click();
+      
+      // Mostrar mensagem de confirmação
+      const notification = document.createElement('div');
+      notification.className = 'fixed top-4 right-4 bg-green-50 text-green-700 p-4 rounded-md shadow-md z-50';
+      notification.innerHTML = `<p><strong>Script importado:</strong> ${name}</p>`;
+      document.body.appendChild(notification);
+      
+      setTimeout(function() {
+        notification.remove();
+      }, 3000);
+    } else {
+      console.error('Função addScript não está disponível');
+    }
+  }
+});
+</script>
+
+<!-- Overlay para verificação de token -->
+<div id="tokenOverlay" class="fixed inset-0 bg-slate-900/90 flex items-center justify-center z-50">
+  <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+    <div class="text-center mb-6">
+      <img src="https://kanbanparachatwoot.com.br/wp-content/uploads/2025/02/image-5-114.png" alt="Logo" class="mx-auto h-12 mb-4">
+      <h2 class="text-xl font-bold text-slate-800 mb-2">Ativação de Módulos StackLab</h2>
+      <p class="text-slate-600 mb-3">Insira seu token de cliente para ativar os módulos.</p>
+      <p class="text-sm text-slate-500 mb-3">Os Módulos StackLab permitem personalizar seu Chatwoot com scripts avançados, temas customizados e integrações exclusivas.</p>
+      <div class="flex items-center justify-center space-x-2 text-xs text-slate-500">
+        <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>Verificado</span>
+        <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd"/></svg>Seguro</span>
+        <span class="flex items-center"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor"><path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/></svg>Customizável</span>
+      </div>
+    </div>
+    
+    <div class="mb-4">
+      <input type="text" id="clientToken" placeholder="Token de ativação" class="w-full px-4 py-2 border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500">
+      <div id="tokenError" class="text-red-600 text-sm mt-1 hidden">Token inválido. Por favor, tente novamente.</div>
+    </div>
+    
+    <div class="flex justify-between items-center">
+      <a href="https://pay.kiwify.com.br/uYYQjiP" target="_blank" class="text-blue-600 text-sm hover:underline">Não tem um token?</a>
+      <button id="activateBtn" class="px-5 py-2.5 bg-[#4f46e5] text-white font-medium rounded-md hover:bg-[#4338ca] focus:ring-4 focus:ring-indigo-300 flex items-center shadow-md">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+          <path d="M10 2a5 5 0 00-5 5v2a2 2 0 00-2 2v5a2 2 0 002 2h10a2 2 0 002-2v-5a2 2 0 00-2-2H7V7a3 3 0 015.905-.75 1 1 0 001.937-.5A5.002 5.002 0 0010 2z" />
+        </svg>
+        <span>Ativar Módulos</span>
+        <span id="activateSpinner" class="hidden ml-2">
+          <svg class="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const savedToken = localStorage.getItem('stacklabModulesToken');
+    const tokenOverlay = document.getElementById('tokenOverlay');
+    const clientToken = document.getElementById('clientToken');
+    const tokenError = document.getElementById('tokenError');
+    const activateBtn = document.getElementById('activateBtn');
+    const activateSpinner = document.getElementById('activateSpinner');
+    
+    // Verificar se já existe um token salvo
+    if (savedToken) {
+      verifyToken(savedToken);
+    }
+    
+    // Função para verificar o token no Supabase
+    async function verifyToken(token) {
+      activateBtn.disabled = true;
+      activateSpinner.classList.remove('hidden');
+      tokenError.classList.add('hidden');
+      
+      try {
+        const response = await fetch(`https://qzxmmoycwvsujblxrzni.supabase.co/rest/v1/clientes_modulos?select=*&token=eq.${encodeURIComponent(token)}`, {
+          method: 'GET',
+          headers: {
+            'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6eG1tb3ljd3ZzdWpibHhyem5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3MDE4OTMsImV4cCI6MjA1MjI3Nzg5M30.NF8T7ZUyrtGXZ6lS-nygLJIB6YLqfiGG6jS05DAjmSU',
+            'Authorization': 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InF6eG1tb3ljd3ZzdWpibHhyem5pIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzY3MDE4OTMsImV4cCI6MjA1MjI3Nzg5M30.NF8T7ZUyrtGXZ6lS-nygLJIB6YLqfiGG6jS05DAjmSU'
+          }
+        });
+        
+        const data = await response.json();
+        
+        // Verificar se existe pelo menos um resultado
+        if (data && data.length > 0) {
+          // Token válido - salvar e esconder overlay
+          localStorage.setItem('stacklabModulesToken', token);
+          tokenOverlay.classList.add('hidden');
+        } else {
+          // Token inválido
+          tokenError.classList.remove('hidden');
+          localStorage.removeItem('stacklabModulesToken');
+        }
+      } catch (error) {
+        console.error('Erro ao verificar token:', error);
+        tokenError.textContent = 'Erro ao verificar token. Tente novamente.';
+        tokenError.classList.remove('hidden');
+      } finally {
+        activateBtn.disabled = false;
+        activateSpinner.classList.add('hidden');
+      }
+    }
+    
+    // Evento de clique no botão de ativação
+    activateBtn.addEventListener('click', function() {
+      const token = clientToken.value.trim();
+      if (token) {
+        verifyToken(token);
+      } else {
+        tokenError.textContent = 'Por favor, insira um token.';
+        tokenError.classList.remove('hidden');
+      }
+    });
+    
+    // Evento para verificar ao pressionar Enter
+    clientToken.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const token = clientToken.value.trim();
+        if (token) {
+          verifyToken(token);
+        } else {
+          tokenError.textContent = 'Por favor, insira um token.';
+          tokenError.classList.remove('hidden');
+        }
+      }
+    });
+  });
+</script> 
